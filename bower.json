@@ -3,8 +3,8 @@
   "description": "Module for management of user's identity with crSession and crAcl",
   "dependencies": {
     "angular": ">=1.2",
-    "cr-acl": "~0.0",
-    "cr-session": "~0.1"
+    "cr-acl": "master",
+    "cr-session": "master"
   },
   "devDependencies": {
     "angular-mocks": ">=1.2"
