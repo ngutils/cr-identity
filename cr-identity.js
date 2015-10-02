@@ -54,11 +54,10 @@ angular.module('cr.identity', [
       }
       $rootScope._identity = identity;
       //crSession.delete('satellizer_token');
-
       $rootScope.$emit("auth:restore:success", identity);
       $log.debug("[crIdentity] Broadcast auth:restore:success");
 
-      d.resolve();
+      d.resolve(identity);
       return d.promise;
     };
 
