@@ -3,13 +3,20 @@
 
 ## Overview
 
-crIdentity helps you to manage user's identity with ([crSession]() and [crAcl]()). crIdentity stores in local storage (with a fallback on cookies) the user's identity restoring it after page reload/new tab opening. So your users identity will be ever consistent.
+crIdentity helps you to manage user's identity with ([crSession](https://github.com/ngutils/cr-session) and [crAcl](https://github.com/ngutils/cr-acl)). crIdentity stores in local storage (with a fallback on cookies) the user's identity restoring it after page reload/new tab opening. So your users identity will be ever consistent.
 
 
 ## Install
 
 ```bash
 bower install cr-identity
+```
+add to your html:
+
+```html
+<script src="bower_components/cr-acl/cr-acl.js"></script>
+<script src="bower_components/cr-identity/cr-identity.js"></script>
+<script src="bower_components/cr-session/cr-session.js"></script>
 ```
 
 then inject it:
