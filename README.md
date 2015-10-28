@@ -1,14 +1,19 @@
 # crIdentity
 [![Build Status](https://api.travis-ci.org/ngutils/cr-identity.svg?branch=master)](https://travis-ci.org/ngutils/cr-identity)
 
-Module for management of user's identity with crSession and crAcl
+## Overview
+
+crIdentity helps you to manage user's identity with ([crSession]() and [crAcl]()). crIdentity stores in local storage (with a fallback on cookies) the user's identity restoring it after page reload/new tab opening. So your users identity will be ever consistent.
+
 
 ## Install
+
 ```bash
 bower install cr-identity
 ```
 
-## Init module
+then inject it:
+
 ```javascript
 angular.module(
         'ngtest',
@@ -21,41 +26,72 @@ angular.module(
 )
 ```
 
-## Getting Started
-This is a possibile implementation. crIdentity helps you to manage restore and purge of your user identity.
+## What's an identity
 
-It triggers a few events:
+The identity consists of and object with:
 
-* auth:identity:success is triggered after login event `auth:login:success`
-* auth:restore:succes is triggered after success identity restore (example: F5 refresh)
-* auth:purge:success is triggered after logout event `auth:logout:success`
+1. a `role` (for example *ROLE_USER*) that can be used to manage access to routes and resources vith crAcl
+2. a `provider`(for example *facebook*) to remember which is the identity provider
+3. a `user` object (for example *{'name': 'Bruce Banner', 'age': 30}*) that's the data that will be stored in session
 
-To manage restore success you can use a promise $q.
+## Create a new identity
+
+You can create and destroy a identity triggering events where you need. Imagine that your backend sends back the user's identity after a successful login:
+
 ```javascript
-crIdentity.restore().then(function(identity) {
+/*
+the backend returns
+{
+  'role': 'ROLE_USER',
+  'identity': {
+    'name': 'Bruce Banner',
+    'age': 30
+  }
+}
+*/
 
+$scope.$broadcast("auth:login:success", {'role': backend.role, 'provider': 'fakelogin', 'user': backend.identity});
+```
+
+This event will start the identity, then you can catch the `auth:identity:success` when the identity is ready, then run your logic:
+
+```javascript
+$scope.$on("auth:identity:success", function(identity) {
+  console.log(identity);
+  $state.go("reserved-area"); //for example redirect to a specific route
 });
 ```
 
+## Restore an identity
+
+Whenever your app starts (for example after a page reload or new tab opened) crIdentity rebuilds the identity, letting you to manage the restore with a promise:
+
 ```javascript
-.run(['$rootScope', 'crAcl', 'crSession', 'crRemoteHttp', 'crIdentity', '$state', '$log',
-function run($rootScope, crAcl, crSession, crRemoteHttp, crIdentity, $state, $log) {
+crIdentity.restore().then(function(identity) {
+  //add your logic
+});
+```
 
-    //set default login state for unauth users
-    crAcl.setRedirect("signin");
+or catching an event:
 
-    //what append on user successful login
-    $rootScope.$on('auth:identity:success', function(event, data) {
-      $state.go("dashboard", {'area': 'test'});
-    });
+```javascript
+$scope.$on("auth:restore:success", function(identity) {
+  //add your logic
+});
+```
 
-    // $rootScope.$on('auth:restore:success', function(event, data) {
-    //
-    // });
+## Destroy an identity
 
-    //what append on user logout
-    $rootScope.$on("auth:purge:success", function(event, data){
-      $state.go("home");
-    });
-}])
+You can purge your identity (and related session) triggering an event:
+
+```javascript
+$scope.$broadcast("auth:logout:success");
+```
+
+then you can catch the successful purge event:
+
+```javascript
+$scope.$on("auth:purge:success", function() {
+  $state.go("home"); //for example redirect to home after logout
+});
 ```
